@@ -1,0 +1,9 @@
+map j <Down>
+map k <Up>
+map J <C-d>
+map K <C-u>
+map <C-j> <C-d>
+map <C-k> <C-u>
+set nextpattern=下一章,下一篇,下一张,下一节,下一版,下一页,下一頁,下页,后页,\bnext,Next,^>$,^(>>|»)$,^(>|»),(>|»)$,\bmore\b
+set previouspattern==上一章,上一篇,上一张,上一节,上一版,上一页,上一頁,上页,前页,\bprev|previous\b,Prev,^<$,^(<<|«)$,^(<|«),(<|«)$
+set hintchars=sadfjklewcmpgh
