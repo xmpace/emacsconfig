@@ -63,4 +63,127 @@
 (global-set-key [f5] 'highlight-symbol-next)
 (global-set-key [(shift f5)] 'highlight-symbol-prev)
 
+;; To auto-start Smex every time you open Emacs
+(require 'smex)
+(smex-initialize)
+;; Bind some keys
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+;; This is your old M-x
+(global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 
+
+;; Make mark visible at all times
+;; Author: Patrick Gundlach 
+;; nice mark - shows mark as a highlighted 'cursor' so user 'always' 
+;; sees where the mark is. Especially nice for killing a region.
+
+(defvar pg-mark-overlay nil
+  "Overlay to show the position where the mark is") 
+(make-variable-buffer-local 'pg-mark-overlay)
+
+(put 'pg-mark-mark 'face 'secondary-selection)
+
+(defvar pg-mark-old-position nil
+  "The position the mark was at. To be able to compare with the
+current position")
+
+(defun pg-show-mark () 
+  "Display an overlay where the mark is at. Should be hooked into 
+activate-mark-hook" 
+  (unless pg-mark-overlay 
+    (setq pg-mark-overlay (make-overlay 0 0))
+    (overlay-put pg-mark-overlay 'category 'pg-mark-mark))
+  (let ((here (mark t)))
+    (when here
+      (move-overlay pg-mark-overlay here (1+ here)))))
+
+(defadvice  exchange-point-and-mark (after pg-mark-exchange-point-and-mark)
+  "Show visual marker"
+  (pg-show-mark))
+
+(ad-activate 'exchange-point-and-mark)
+(add-hook 'activate-mark-hook 'pg-show-mark)
+;;; Visible mark end here
+
+
+;; Expand region
+(add-to-list 'load-path "~/.emacs.d/expand-region")
+(require 'expand-region)
+(global-set-key (kbd "C-=") 'er/expand-region)
+
+
+;; Auto Mark
+;; need auto-mark.el
+(when (require 'auto-mark nil t)
+  (setq auto-mark-command-class-alist
+        '((anything . anything)
+          (goto-line . jump)
+          (indent-for-tab-command . ignore)
+          (undo . ignore)))
+  (setq auto-mark-command-classifiers
+        (list (lambda (command)
+                (if (and (eq command 'self-insert-command)
+                         (eq last-command-char ? ))
+                    'ignore))))
+  (global-auto-mark-mode 1))
+;;; Auto mark end here
+
+;;; Make ibuffer default
+(defalias 'list-buffers 'ibuffer)
+
+;;; Make ido-mode default for switching buffer
+(ido-mode 1)
+
+;;; Switching Next/Previous User Buffers
+(defun next-user-buffer ()
+  "Switch to the next user buffer.
+User buffers are those whose name does not start with *."
+  (interactive)
+  (next-buffer)
+  (let ((i 0))
+    (while (and (string-match "^*" (buffer-name)) (< i 50))
+      (setq i (1+ i)) (next-buffer) )))
+
+(defun previous-user-buffer ()
+  "Switch to the previous user buffer.
+User buffers are those whose name does not start with *."
+  (interactive)
+  (previous-buffer)
+  (let ((i 0))
+    (while (and (string-match "^*" (buffer-name)) (< i 50))
+      (setq i (1+ i)) (previous-buffer) )))
+
+(defun next-emacs-buffer ()
+  "Switch to the next emacs buffer.
+Emacs buffers are those whose name starts with *."
+  (interactive)
+  (next-buffer)
+  (let ((i 0))
+    (while (and (not (string-match "^*" (buffer-name))) (< i 50))
+      (setq i (1+ i)) (next-buffer) )))
+
+(defun previous-emacs-buffer ()
+  "Switch to the previous emacs buffer.
+Emacs buffers are those whose name starts with *."
+  (interactive)
+  (previous-buffer)
+  (let ((i 0))
+    (while (and (not (string-match "^*" (buffer-name))) (< i 50))
+      (setq i (1+ i)) (previous-buffer) )))
+
+(global-set-key (kbd "<C-prior>") 'previous-user-buffer) ; Ctrl+PageUp
+(global-set-key (kbd "<C-next>") 'next-user-buffer) ; Ctrl+PageDown
+(global-set-key (kbd "<C-S-prior>") 'previous-emacs-buffer) ; Ctrl+Shift+PageUp
+(global-set-key (kbd "<C-S-next>") 'next-emacs-buffer) ; Ctrl+Shift+PageDown
+;;; Switching Next/Previous User Buffers ends here
+
+;; ELPA package management
+(require 'package)
+(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ("melpa" . "http://melpa.milkbox.net/packages/")))
+
+(add-to-list 'load-path "~/.emacs.d/elpa/tabbar-20110824.1439")
+(require 'tabbar)
+(tabbar-mode t)
