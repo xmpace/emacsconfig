@@ -28,7 +28,7 @@
 ;;--------------------Evil模式---------------------
 (add-to-list 'load-path "~/.emacs.d/evil")
 (require 'evil)
-(evil-mode 0)
+(evil-mode 1)
 ;;--------------------Evil模式---------------------
 
 ;; 显示行号
@@ -184,6 +184,24 @@ Emacs buffers are those whose name starts with *."
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.milkbox.net/packages/")))
 
+;;; tabbar-mode
 (add-to-list 'load-path "~/.emacs.d/elpa/tabbar-20110824.1439")
 (require 'tabbar)
 (tabbar-mode t)
+
+;;; set yes/no to y/n
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;;; weibo
+(add-to-list 'load-path "~/.emacs.d/weibo.emacs")
+(require 'weibo)
+
+(require 'recentf)
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+(global-set-key "\C-x\ \C-r" 'recentf-open-files)
+
+;;; commenter
+(add-to-list 'load-path "~/.emacs.d/elpa/evil-nerd-commenter-20130818.2136")
+(require 'evil-nerd-commenter)
+(evilnc-default-hotkeys)
